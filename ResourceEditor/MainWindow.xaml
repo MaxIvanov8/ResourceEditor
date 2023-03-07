@@ -1,0 +1,82 @@
+﻿<Window x:Class="ResourceEditor.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ResourceEditor"
+        mc:Ignorable="d"
+        Title="Resource editor" Height="450" Width="800"
+        d:DataContext="{d:DesignInstance local:MainViewModel, IsDesignTimeCreatable=True}">
+    <Window.Resources>
+        <Style TargetType="TextBlock" x:Key="HeaderStyle">
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="16"/>
+        </Grid.RowDefinitions>
+        <Menu Grid.Row="0">
+            <MenuItem Header="Choose folder" Command="{Binding ChooseFolderCommand}"/>
+            <TextBlock Text="{Binding FolderName}" Margin="10,0,0,0"/>
+        </Menu>
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+            <StackPanel Orientation="Horizontal">
+                <StackPanel Width="250">
+                    <TextBlock Text="Paths" HorizontalAlignment="Center" Style="{StaticResource HeaderStyle}"/>
+                    <TextBox Text="" HorizontalAlignment="Stretch" IsEnabled="{Binding Files.ListNotEmpty}"/>
+                    <ItemsControl ItemsSource="{Binding Files.FilterNames}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border BorderBrush="Gray" BorderThickness="1" Height="20" Background="LightGray">
+                                    <TextBlock Text="{Binding Group.ShortPath}" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+                <StackPanel Width="150">
+                    <TextBlock Text="Keys" HorizontalAlignment="Center" Style="{StaticResource HeaderStyle}"/>
+                    <TextBox Text="{Binding Files.NameFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Stretch" IsEnabled="{Binding Files.ListNotEmpty}"/>
+                    <ItemsControl ItemsSource="{Binding Files.FilterNames, UpdateSourceTrigger=PropertyChanged}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border BorderBrush="Gray" BorderThickness="1" Height="20" Background="LightGray">
+                                    <TextBlock Text="{Binding Value}" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+                <ItemsControl ItemsSource="{Binding Files.LangList}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <TextBlock Text="{Binding Language}" HorizontalAlignment="Center" Style="{StaticResource HeaderStyle}" Margin="6,0"/>
+                                <ItemsControl ItemsSource="{Binding FilterValues}" Margin="0,18,0,0">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBox Text="{Binding Value}" Height="20" VerticalAlignment="Center"/>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </ScrollViewer>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button Content="Save" Command="{Binding SaveCommand}" Width="100"/>
+            <Button Content="Clear" Command="{Binding ClearCommand}" Width="100" Margin="20,0,0,0"/>
+        </StackPanel>
+    </Grid>
+</Window>
