@@ -4,19 +4,22 @@ namespace ResourceEditor.Models
 {
     public class Entry
     {
-        public Entry(DictionaryEntry entry, ResxFile resxFile)
+        private Entry(ResxFile resxFile)
         {
-            Name = entry.Key.ToString();
-            Value = entry.Value.ToString();
             ResxFile = resxFile;
         }
 
-        public Entry(string nameValue, ResxFile resxFile)
+        public Entry(DictionaryEntry entry, ResxFile resxFile):this(resxFile)
+        {
+            Name = entry.Key.ToString();
+            Value = entry.Value.ToString();
+        }
+
+        public Entry(string nameValue, ResxFile resxFile) : this(resxFile)
         {
             Name = nameValue;
             Value = string.Empty;
             NoValue = true;
-            ResxFile = resxFile;
         }
 
         public ResxFile ResxFile { get; }

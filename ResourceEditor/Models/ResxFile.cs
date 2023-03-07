@@ -10,7 +10,6 @@ namespace ResourceEditor.Models
     {
         public List<Entry> Values { get; }
         public Group Group { get; }
-        
 
         public ResxFile(Group group)
         {

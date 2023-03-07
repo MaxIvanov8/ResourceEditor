@@ -29,14 +29,7 @@ namespace ResourceEditor.Models
             }
         }
 
-        public IEnumerable<Entry> FilterValues
-        {
-            get
-            {
-                if (FilterName == string.Empty) return EntryList;
-                return EntryList.Where(item => item.Name.Contains(FilterName));
-            }
-        }
+        public IEnumerable<Entry> FilterValues => FilterName == string.Empty ? EntryList : EntryList.Where(item => item.Name.Contains(FilterName));
 
         public IEnumerable<Entry> EntryList
         {
