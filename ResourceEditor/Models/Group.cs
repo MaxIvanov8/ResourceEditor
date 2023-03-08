@@ -7,11 +7,9 @@ namespace ResourceEditor.Models
         public Group(string fileName, string folderName)
         {
             FileName = fileName;
-            var t = FileName.Replace(folderName, string.Empty);
-            var resName = Path.Combine(Path.GetDirectoryName(t), Path.GetFileNameWithoutExtension(t));
-            var split = resName.Split('.');
+            var split = Path.GetFileNameWithoutExtension(FileName).Split('.');
             Language = split.Length > 1 ? split[1] : "Default";
-            ShortPath = split[0];
+            ShortPath = Path.Combine(Path.GetDirectoryName(FileName).Replace(folderName, string.Empty), split[0]);
         }
 
         public Group(Group group, string language)
