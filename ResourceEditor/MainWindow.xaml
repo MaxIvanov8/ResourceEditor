@@ -16,18 +16,19 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="16"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="16"/>
         </Grid.RowDefinitions>
         <Menu Grid.Row="0">
             <MenuItem Header="Choose folder" Command="{Binding ChooseFolderCommand}"/>
-            <TextBlock Text="{Binding FolderName}" Margin="10,0,0,0"/>
         </Menu>
+        <TextBlock Grid.Row="0" Text="{Binding FolderName}" HorizontalAlignment="Right" Margin="0,0,10,0"/>
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
             <StackPanel Orientation="Horizontal">
                 <StackPanel Width="250">
                     <TextBlock Text="Paths" HorizontalAlignment="Center" Style="{StaticResource HeaderStyle}"/>
-                    <TextBox Text="" HorizontalAlignment="Stretch" IsEnabled="{Binding Files.ListNotEmpty}"/>
+                    <TextBox HorizontalAlignment="Stretch" IsEnabled="{Binding Files.ListNotEmpty}"/>
                     <ItemsControl ItemsSource="{Binding Files.FilterNames}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
@@ -74,7 +75,7 @@
                 </ItemsControl>
             </StackPanel>
         </ScrollViewer>
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center">
             <Button Content="Save" Command="{Binding SaveCommand}" Width="100"/>
             <Button Content="Clear" Command="{Binding ClearCommand}" Width="100" Margin="20,0,0,0"/>
         </StackPanel>

@@ -1,28 +1,27 @@
 ﻿using System.IO;
 
-namespace ResourceEditor.Models
+namespace ResourceEditor.Models;
+
+public class Group
 {
-    public class Group
-    {
-        public Group(string fileName, string folderName)
-        {
-            FileName = fileName;
-            var split = Path.GetFileNameWithoutExtension(FileName).Split('.');
-            Language = split.Length > 1 ? split[1] : "Default";
-            ShortPath = Path.Combine(Path.GetDirectoryName(FileName).Replace(folderName, string.Empty), split[0]);
-        }
+	public Group(string fileName, string folderName)
+	{
+		FileName = fileName;
+		var split = Path.GetFileNameWithoutExtension(FileName).Split('.');
+		Language = split.Length > 1 ? split[1] : "Default";
+		ShortPath = Path.Combine(Path.GetDirectoryName(FileName).Replace(folderName, string.Empty), split[0]);
+	}
 
-        public Group(Group group, string language)
-        {
-            Language = language;
-            ShortPath = group.ShortPath;
-            FileName= $"{Path.Combine(Path.GetDirectoryName(group.FileName), Path.GetFileNameWithoutExtension(group.FileName))}.{language}.resx";
-        }
+	public Group(Group group, string language)
+	{
+		Language = language;
+		ShortPath = group.ShortPath;
+		FileName= $"{Path.Combine(Path.GetDirectoryName(group.FileName), Path.GetFileNameWithoutExtension(group.FileName))}.{language}.resx";
+	}
 
-        public string FileName { get; }
-        public string Language { get; }
-        public string ShortPath { get; }
+	public string FileName { get; }
+	public string Language { get; }
+	public string ShortPath { get; }
 
-        public bool IsEqual(Group other) => ShortPath == other.ShortPath;
-    }
+	public bool IsEqual(Group other) => ShortPath == other.ShortPath;
 }

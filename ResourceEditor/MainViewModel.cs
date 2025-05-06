@@ -1,74 +1,50 @@
 ﻿using System.IO;
-using System.Linq;
-using System.Windows.Forms;
-using System.Windows.Input;
-using DevExpress.Mvvm;
+using System.Windows;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Microsoft.Win32;
 using ResourceEditor.Models;
-using MessageBox = System.Windows.MessageBox;
 
-namespace ResourceEditor
+namespace ResourceEditor;
+
+public partial class MainViewModel:ObservableObject
 {
-    public class MainViewModel:ViewModelBase
-    {
-        private string _folderName;
+	[ObservableProperty]
+	private string _folderName;
 
-        public string FolderName
-        {
-            get => _folderName;
+	[ObservableProperty]
+	[NotifyCanExecuteChangedFor(nameof(SaveCommand), nameof(ClearCommand))]
+	private Files _files;
 
-            set
-            {
-                _folderName = value;
-                RaisePropertyChanged();
-            }
-        }
+	public MainViewModel()
+	{
+		_files = new Files();
+	}
 
-        private Files _files;
-        public Files Files
-        {
-            get => _files;
-            private set
-            {
-                _files=value;
-                RaisePropertyChanged();
-            }
-        }
+	[RelayCommand(CanExecute = nameof(CanExecute))]
+	private void Clear()
+	{
+		Files = new Files();
+		FolderName = string.Empty;
+	}
 
-        public ICommand ChooseFolderCommand { get; }
-        public ICommand SaveCommand { get; }
-        public ICommand ClearCommand { get; }
+	[RelayCommand(CanExecute = nameof(CanExecute))]
+	private void Save() => Files.Save();
 
-        public MainViewModel()
-        {
-            _files = new Files();
-            ChooseFolderCommand = new DelegateCommand(ChooseFolderMethod);
-            SaveCommand = new DelegateCommand(SaveMethod, ()=>Files.ListNotEmpty);
-            ClearCommand = new DelegateCommand(ClearMethod, ()=> Files.ListNotEmpty);
-        }
+	private bool CanExecute => Files.ListNotEmpty;
 
-        private void ClearMethod()
-        {
-            Files = new Files();
-            FolderName = string.Empty;
-        }
-
-        private void SaveMethod()
-        {
-            Files.Save();
-        }
-
-        private void ChooseFolderMethod()
-        {
-            var dialog = new FolderBrowserDialog();
-            if (dialog.ShowDialog() == DialogResult.OK)
-            {
-                FolderName = dialog.SelectedPath;
-                var filePaths = Directory.GetFiles(FolderName, "*.resx", SearchOption.AllDirectories).ToList();
-                if (filePaths.Count == 0)
-                    MessageBox.Show("There is no resource files in this directory");
-                else
-                    Files = new Files(filePaths, FolderName);
-            }
-        }
-    }
+	[RelayCommand]
+	private void ChooseFolder()
+	{
+		var dialog = new OpenFolderDialog();
+		if (dialog.ShowDialog() == true)
+		{
+			FolderName = dialog.FolderName;
+			var filePaths = Directory.GetFiles(FolderName, "*.resx", SearchOption.AllDirectories);
+			if (filePaths.Length == 0)
+				MessageBox.Show("There are no resource files in this directory");
+			else
+				Files = new Files(filePaths, FolderName);
+		}
+	}
 }

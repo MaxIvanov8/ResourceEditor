@@ -1,14 +1,7 @@
-﻿namespace ResourceEditor.Models
-{
-    public class Name
-    {
-        public string Value { get; }
-        public Group Group { get; }
+﻿namespace ResourceEditor.Models;
 
-        public Name(string value, Group group)
-        {
-            Value = value;
-            Group = group;
-        }
-    }
+public class Name(string value, Group group)
+{
+	public string Value { get; } = value;
+	public Group Group { get; } = group;
 }

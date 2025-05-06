@@ -1,92 +1,84 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
-using System.Runtime.CompilerServices;
+using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace ResourceEditor.Models
+namespace ResourceEditor.Models;
+
+public class Files: ObservableObject
 {
-    public class Files: INotifyPropertyChanged
-    {
-        public ObservableCollection<Name> Names { get; }
-        public List<LangClass> LangList { get; }
-        private string _nameFilter;
-        public string NameFilter
-        {
-            get => _nameFilter;
-            set
-            {
-                _nameFilter = value;
-                OnPropertyChanged();
-                OnPropertyChanged(nameof(FilterNames));
-                foreach (var langClass in LangList)
-                    langClass.FilterName = _nameFilter;
-            }
-        }
+	public ObservableCollection<Name> Names { get; }
+	public List<LangClass> LangList { get; }
 
-        public IEnumerable<Name> FilterNames => _nameFilter == string.Empty
-            ? Names
-            : Names.Where(item => item.Value.Contains(_nameFilter));
+	private string _nameFilter;
+	public string NameFilter
+	{
+		get => _nameFilter;
+		set
+		{
+			_nameFilter = value;
+			OnPropertyChanged();
+			OnPropertyChanged(nameof(FilterNames));
+			foreach (var langClass in LangList)
+				langClass.FilterName = _nameFilter;
+		}
+	}
 
-        public Files()
-        {
-            LangList = new List<LangClass>();
-            NameFilter = string.Empty;
-            Names = new ObservableCollection<Name>();
-        }
+	public IEnumerable<Name> FilterNames => _nameFilter == string.Empty
+		? Names
+		: Names.Where(item => item.Value.Contains(_nameFilter));
 
-        public Files(IEnumerable<string> pathList, string folderName) : this()
-        {
-            var filesList = pathList.Select(path => new ResxFile(path, folderName)).ToList();
+	public Files()
+	{
+		LangList = [];
+		NameFilter = string.Empty;
+		Names = [];
+	}
 
-            foreach (var resxFile in filesList)
-            {
-                var t = LangList.FirstOrDefault(i => i.Language == resxFile.Group.Language);
-                if(t==null) LangList.Add(new LangClass(resxFile));
-                else t.ResxFiles.Add(resxFile);
-            }
+	public Files(IEnumerable<string> pathList, string folderName) : this()
+	{
+		var filesList = pathList.Select(path => new ResxFile(path, folderName)).ToList();
 
-            foreach (var resxFile in filesList)
-            foreach (var resValue in resxFile.Values.Where(resValue => !Names.Any(item =>
-                         item.Value == resValue.Name && item.Group.IsEqual(resValue.ResxFile.Group))))
-            {
-                Names.Add(new Name(resValue.Name, resValue.ResxFile.Group));
-            }
+		foreach (var resxFile in filesList)
+		{
+			var t = LangList.FirstOrDefault(i => i.Language == resxFile.Group.Language);
+			if(t==null) LangList.Add(new LangClass(resxFile));
+			else t.ResxFiles.Add(resxFile);
+		}
 
-            foreach (var name in Names)
-            foreach (var lang in LangList)
-            {
-                var t = lang.EntryList.FirstOrDefault(i =>
-                    i.ResxFile.Group.IsEqual(name.Group) && i.Name == name.Value);
-                if (t == null)
-                    lang.AddEntryToResxFile(name);
-            }
+		foreach (var resxFile in filesList)
+		foreach (var resValue in resxFile.Values.Where(resValue => !Names.Any(item =>
+			         item.Value == resValue.Name && item.Group.IsEqual(resValue.ResxFile.Group))))
+		{
+			Names.Add(new Name(resValue.Name, resValue.ResxFile.Group));
+		}
 
-            LangList = LangList.OrderBy(i => i.Language).ToList();
-            var defaultLang = LangList.FirstOrDefault(i => i.Language == "Default");
-            if (defaultLang != null)
-            {
-                LangList.Remove(defaultLang);
-                LangList.Insert(0, defaultLang);
-            }
+		foreach (var name in Names)
+		foreach (var lang in LangList)
+		{
+			var t = lang.EntryList.FirstOrDefault(i =>
+				i.ResxFile.Group.IsEqual(name.Group) && i.Name == name.Value);
+			if (t == null)
+				lang.AddEntryToResxFile(name);
+		}
 
-            Names = new ObservableCollection<Name>(Names.OrderBy(item => item.Value)
-                .ThenBy(item => item.Group.FileName));
-        }
+		LangList = LangList.OrderBy(i => i.Language).ToList();
+		var defaultLang = LangList.FirstOrDefault(i => i.Language == "Default");
+		if (defaultLang != null)
+		{
+			LangList.Remove(defaultLang);
+			LangList.Insert(0, defaultLang);
+		}
 
-        public bool ListNotEmpty => LangList.Count > 0;
+		Names = [.. Names.OrderBy(item => item.Value)
+			.ThenBy(item => item.Group.FileName)];
+	}
 
-        public void Save()
-        {
-            foreach (var langClassResxFile in LangList.SelectMany(langClass => langClass.ResxFiles))
-                langClassResxFile.Save();
-        }
+	public bool ListNotEmpty => LangList.Count > 0;
 
-        public event PropertyChangedEventHandler? PropertyChanged;
-
-        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-    }
+	public void Save()
+	{
+		foreach (var langClassResxFile in LangList.SelectMany(langClass => langClass.ResxFiles))
+			langClassResxFile.Save();
+	}
 }

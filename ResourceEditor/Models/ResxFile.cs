@@ -1,43 +1,43 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Resources.NetStandard;
+using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace ResourceEditor.Models
+namespace ResourceEditor.Models;
+
+public class ResxFile:ObservableObject
 {
-    public class ResxFile:INotifyPropertyChanged
-    {
-        public List<Entry> Values { get; }
-        public Group Group { get; }
+	public List<Entry> Values { get; }
+	public Group Group { get; }
 
-        public ResxFile(Group group)
-        {
-            Values = new List<Entry>();
-            Group = group;
-        }
+	private ResxFile()
+	{
+		Values = [];
+	}
 
-        public ResxFile(string fileName, string folderName)
-        {
-            Group = new Group(fileName, folderName);
-            Values = new List<Entry>();
-            var resReader = new ResXResourceReader(fileName);
-            foreach (DictionaryEntry d in resReader)
-                Values.Add(new Entry(d,this));
-            resReader.Close();
-        }
+	public ResxFile(Group group):this()
+	{
+		Group = group;
+	}
 
-        public void Save()
-        {
-            if(Values.Any(d => d.NeedToWrite))
-            {
-                var resWriter = new ResXResourceWriter(Group.FileName);
-                foreach (var d in Values.Where(d => d.NeedToWrite))
-                    resWriter.AddResource(d.Name, d.Value);
-                resWriter.Close();
-            }
-        }
+	public ResxFile(string fileName, string folderName) : this()
+	{
+		Group = new Group(fileName, folderName);
+		var resReader = new ResXResourceReader(fileName);
+		foreach (DictionaryEntry d in resReader)
+			Values.Add(new Entry(d,this));
+		resReader.Close();
+	}
 
-        public event PropertyChangedEventHandler? PropertyChanged;
-    }
+	public void Save()
+	{
+		if(Values.Any(d => d.NeedToWrite))
+		{
+			var resWriter = new ResXResourceWriter(Group.FileName);
+			foreach (var d in Values.Where(d => d.NeedToWrite))
+				resWriter.AddResource(d.Name, d.Value);
+			resWriter.Close();
+		}
+	}
 }
