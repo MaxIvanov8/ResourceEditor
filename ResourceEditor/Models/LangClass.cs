@@ -30,7 +30,7 @@ public class LangClass:ObservableObject
 
 	public IEnumerable<Entry> FilterValues => FilterName == string.Empty ? EntryList : EntryList.Where(item => item.Name.Contains(FilterName));
 
-	public IEnumerable<Entry> EntryList
+	public List<Entry> EntryList
 	{
 		get
 		{
@@ -38,7 +38,7 @@ public class LangClass:ObservableObject
 			foreach (var resxFile in ResxFiles)
 				result.AddRange(resxFile.Values);
 
-			return result.OrderBy(i=>i.Name).ThenBy(i=>i.ResxFile.Group.FileName);
+			return result.OrderBy(i=>i.Name).ThenBy(i=>i.ResxFile.Group.FileName).ToList();
 		}
 	}
 

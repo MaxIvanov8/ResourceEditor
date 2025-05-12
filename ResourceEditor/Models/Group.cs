@@ -4,6 +4,10 @@ namespace ResourceEditor.Models;
 
 public class Group
 {
+	public string FileName { get; }
+	public string Language { get; }
+	public string ShortPath { get; }
+
 	public Group(string fileName, string folderName)
 	{
 		FileName = fileName;
@@ -16,12 +20,8 @@ public class Group
 	{
 		Language = language;
 		ShortPath = group.ShortPath;
-		FileName= $"{Path.Combine(Path.GetDirectoryName(group.FileName), Path.GetFileNameWithoutExtension(group.FileName))}.{language}.resx";
+		FileName = language=="Default" ? Path.Combine(Path.GetDirectoryName(group.FileName), "Resources.resx") : $"{Path.Combine(Path.GetDirectoryName(group.FileName), Path.GetFileNameWithoutExtension(group.FileName))}.{language}.resx";
 	}
-
-	public string FileName { get; }
-	public string Language { get; }
-	public string ShortPath { get; }
 
 	public bool IsEqual(Group other) => ShortPath == other.ShortPath;
 }
