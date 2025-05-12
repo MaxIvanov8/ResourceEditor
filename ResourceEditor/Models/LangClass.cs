@@ -1,43 +1,20 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace ResourceEditor.Models;
 
-public class LangClass:ObservableObject
+public class LangClass(ResxFile resxFile)
 {
-	public LangClass(ResxFile resxFile)
-	{
-		FilterName = string.Empty;
-		ResxFiles = [resxFile];
-		Language = resxFile.Group.Language;
-	}
+	public string Language { get; } = resxFile.Group.Language;
+	public List<ResxFile> ResxFiles { get; set; } = [resxFile];
 
-	public string Language { get; }
-	public List<ResxFile> ResxFiles { get; set; }
-
-	private string _filterName;
-	public string FilterName
-	{
-		get => _filterName;
-		set
-		{
-			_filterName = value;
-			OnPropertyChanged();
-			OnPropertyChanged(nameof(FilterValues));
-		}
-	}
-
-	public IEnumerable<Entry> FilterValues => FilterName == string.Empty ? EntryList : EntryList.Where(item => item.Name.Contains(FilterName));
-
-	public List<Entry> EntryList
+	public List<Entry> EntryListOrdered
 	{
 		get
 		{
 			var result = new List<Entry>();
 			foreach (var resxFile in ResxFiles)
 				result.AddRange(resxFile.Values);
-
 			return result.OrderBy(i=>i.Name).ThenBy(i=>i.ResxFile.Group.FileName).ToList();
 		}
 	}

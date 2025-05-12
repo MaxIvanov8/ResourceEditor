@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Resources.NetStandard;
-using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace ResourceEditor.Models;
 
-public class ResxFile:ObservableObject
+public class ResxFile
 {
 	public List<Entry> Values { get; }
 	public Group Group { get; }

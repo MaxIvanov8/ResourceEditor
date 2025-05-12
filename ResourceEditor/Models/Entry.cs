@@ -4,11 +4,11 @@ namespace ResourceEditor.Models;
 
 public class Entry
 {
+	private readonly bool _noValue;
 	public ResxFile ResxFile { get; }
 	public string Name { get; }
 	public string Value { get; set; }
-	public bool NoValue { get; }
-	public bool NeedToWrite => !NoValue || Value != string.Empty;
+	public bool NeedToWrite => !_noValue || Value != string.Empty;
 
 	private Entry(ResxFile resxFile)
 	{
@@ -25,6 +25,6 @@ public class Entry
 	{
 		Name = nameValue;
 		Value = string.Empty;
-		NoValue = true;
+		_noValue = true;
 	}
 }
