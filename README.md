@@ -1,7 +1,7 @@
 # ResourceEditor
 This repo contains .NET project of simple resource editor on Windows Presentation Foundation(WPF) technology with using MVVM pattern. 
 
-If client have several directories with resourse files on different languages, "Resource editor" can help add missing resource files and change entry values.
+If client have several directories with resourse files on different languages, "Resource editor" can help to add missing resource files and change entry values.
 
 User can:
 1. Choose folder with resource files.
