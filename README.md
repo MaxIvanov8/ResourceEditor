@@ -10,6 +10,8 @@ User can:
 
 If you need to save empty entries, you can click on checkbox.
 
+In this project I use a DataTable because the simple DataGrid binding does not allow me to specify the number of columns in advance. So I first get the data from the files, then enter it into the DataTable. After the changes, I output the data from the DataTable and save it to the corresponding files.
+
 ## Stack:
 - NET9
 - WPF
