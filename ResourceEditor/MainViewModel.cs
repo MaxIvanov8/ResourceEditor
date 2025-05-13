@@ -67,7 +67,7 @@ public partial class MainViewModel : ObservableObject
 		}
 		foreach (var langClassResxFile in _langList.SelectMany(langClass => langClass.ResxFiles))
 			langClassResxFile.Save(AddEmptyEntries);
-		MessageBox.Show("Data saved");
+		MessageBox.Show("Data saved", ProgramMessage);
 	}
 
 
