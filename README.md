@@ -3,7 +3,7 @@ This repo contains .NET project of simple resource editor on Windows Presentatio
 
 If client have several directories with resourse files on different languages, "Resource editor" can help to add missing resource files and change entry values.
 
-![alt text](Screenshot.JPG)
+![alt text](Screenshot.jpg)
 
 User can:
 1. Choose folder with resource files.
