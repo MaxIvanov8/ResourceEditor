@@ -13,8 +13,11 @@ namespace ResourceEditor;
 
 public partial class MainViewModel:ObservableObject
 {
+	private const string ProgramMessage = "ProgramMessage";
 	[ObservableProperty]
 	private string _folderName;
+
+	[ObservableProperty] private bool _addEmptyEntries;
 
 	[ObservableProperty] private DataTable _dataTable;
 	public DataView DataView => DataTable.DefaultView;
@@ -33,11 +36,15 @@ public partial class MainViewModel:ObservableObject
 		_langList.Clear();
 		FolderName = string.Empty;
 		DataTable.Clear();
+		Update();
+	}
+
+	private void Update()
+	{
 		OnPropertyChanged(nameof(DataView));
 		OnPropertyChanged(nameof(CanExecute));
 	}
 
-	public bool CanExecute => _langList.Count > 0;
 
 	[RelayCommand]
 	private void Save()
@@ -52,9 +59,8 @@ public partial class MainViewModel:ObservableObject
 				entry.Value = row.ItemArray[i + 2].ToString();
 			}
 		}
-
 		foreach (var langClassResxFile in _langList.SelectMany(langClass => langClass.ResxFiles))
-			langClassResxFile.Save();
+			langClassResxFile.Save(AddEmptyEntries);
 		MessageBox.Show("Data saved");
 	}
 
@@ -65,10 +71,9 @@ public partial class MainViewModel:ObservableObject
 		var dialog = new OpenFolderDialog();
 		if (dialog.ShowDialog() == true)
 		{
-			FolderName = dialog.FolderName;
-			var filePaths = Directory.GetFiles(FolderName, "*.resx", SearchOption.AllDirectories);
+			var filePaths = Directory.GetFiles(dialog.FolderName, "*.resx", SearchOption.AllDirectories);
 			if (filePaths.Length == 0)
-				MessageBox.Show("There are no resource files in this directory");
+				MessageBox.Show("There are no resource files in this directory", ProgramMessage);
 			else
 			{
 				var filesList = new List<ResxFile>();
@@ -76,16 +81,23 @@ public partial class MainViewModel:ObservableObject
 				{
 					try
 					{
-						filesList.Add(new ResxFile(filePath, FolderName));
-
+						filesList.Add(new ResxFile(filePath, dialog.FolderName));
 					}
 					catch (Exception e)
 					{
 						// ignored
 					}
 				}
+
 				if (filesList.Count == 0)
-					MessageBox.Show("There are no text resource files in this directory");
+				{
+					MessageBox.Show("There are no text resource files in this directory", ProgramMessage);
+					return;
+				}
+
+				if (filesList.Count != filePaths.Length)
+					MessageBox.Show("Some resource files contains not only text", ProgramMessage);
+				FolderName = dialog.FolderName;
 
 				foreach (var resxFile in filesList)
 				{
@@ -93,22 +105,14 @@ public partial class MainViewModel:ObservableObject
 					if (t == null) _langList.Add(new LangClass(resxFile));
 					else t.ResxFiles.Add(resxFile);
 				}
-				var names = new List<Name>();
+				var entryList = new List<Entry>();
 
 				foreach (var resxFile in filesList)
-				foreach (var resValue in resxFile.Values.Where(resValue => !names.Any(item =>
-					         item.Value == resValue.Name && item.Group.IsEqual(resValue.ResxFile.Group))))
-				{
-					names.Add(new Name(resValue.Name, resValue.ResxFile.Group));
-				}
+					entryList.AddRange(resxFile.Values.Where(entry => !entryList.Any(item => item.IsEqual(entry))));
 
-				foreach (var name in names)
-				foreach (var lang in _langList)
-				{
-					if (!lang.EntryListOrdered.Any(i =>
-						    i.ResxFile.Group.IsEqual(name.Group) && i.Name == name.Value))
-						lang.AddEntryToResxFile(name);
-				}
+				foreach (var entry in entryList)
+				foreach (var lang in _langList.Where(lang => !lang.EntryList.Any(i =>i.IsEqual(entry))))
+					lang.AddEntryToResxFile(entry);
 
 				_langList = _langList.OrderBy(i => i.Language).ToList();
 				var defaultLang = _langList.FirstOrDefault(i => i.Language == "Default");
@@ -128,16 +132,17 @@ public partial class MainViewModel:ObservableObject
 				for (var i = 0; i < _langList[0].EntryListOrdered.Count; i++)
 				{
 					var l = new object[_langList.Count + 2];
-					l[0] = _langList[0].EntryListOrdered[i].ResxFile.Group.ShortPath;
+					l[0] = _langList[0].EntryListOrdered[i].Group.ShortPath;
 					l[1] = _langList[0].EntryListOrdered[i].Name;
 					for (var j = 0; j < _langList.Count; j++)
 						l[j + 2] = _langList[j].EntryListOrdered[i].Value;
 
 					DataTable.Rows.Add(l);
 				}
-				OnPropertyChanged(nameof(DataView)); 
-				OnPropertyChanged(nameof(CanExecute));
+				Update();
 			}
 		}
 	}
+
+	public bool CanExecute => _langList.Count > 0;
 }

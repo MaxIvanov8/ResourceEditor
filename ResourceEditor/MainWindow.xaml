@@ -7,6 +7,9 @@
         mc:Ignorable="d"
         Title="Resource editor" Height="450" Width="800"
         d:DataContext="{d:DesignInstance local:MainViewModel, IsDesignTimeCreatable=True}">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -19,11 +22,13 @@
             <MenuItem Header="Choose folder" Command="{Binding ChooseFolderCommand}"/>
         </Menu>
         <TextBlock Grid.Row="0" Text="{Binding FolderName}" HorizontalAlignment="Right" Margin="0,0,10,0"/>
-        <DataGrid Grid.Row="1" ItemsSource="{Binding DataView, UpdateSourceTrigger=PropertyChanged}" AutoGenerateColumns="True" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CanUserAddRows="False"
-                  ColumnWidth="*" HorizontalScrollBarVisibility="Auto"/>
-        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center">
-            <Button Content="Save" Command="{Binding SaveCommand}" Width="100" IsEnabled="{Binding CanExecute}"/>
-            <Button Content="Clear" Command="{Binding ClearCommand}" Width="100" IsEnabled="{Binding CanExecute}" Margin="20,0,0,0"/>
+        <DataGrid Grid.Row="1" ItemsSource="{Binding DataView, UpdateSourceTrigger=PropertyChanged}" AutoGenerateColumns="True" CanUserAddRows="False"
+                  ColumnWidth="*" HorizontalScrollBarVisibility="Disabled" Visibility="{Binding CanExecute, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+        <CheckBox Grid.Row="3" HorizontalAlignment="Left" Content="Add empty entries" IsChecked="{Binding AddEmptyEntries}" VerticalAlignment="Center" Margin="10,0,0,0" IsEnabled="{Binding CanExecute}"/>
+
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" IsEnabled="{Binding CanExecute}">
+            <Button Content="Save" Command="{Binding SaveCommand}" Width="100"  Margin="20,0,0,0"/>
+            <Button Content="Clear" Command="{Binding ClearCommand}" Width="100"  Margin="20,0,0,0"/>
         </StackPanel>
     </Grid>
 </Window>

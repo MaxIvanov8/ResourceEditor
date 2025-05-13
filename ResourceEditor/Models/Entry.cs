@@ -4,27 +4,25 @@ namespace ResourceEditor.Models;
 
 public class Entry
 {
-	private readonly bool _noValue;
-	public ResxFile ResxFile { get; }
+	public Group Group { get; }
 	public string Name { get; }
 	public string Value { get; set; }
-	public bool NeedToWrite => !_noValue || Value != string.Empty;
 
-	private Entry(ResxFile resxFile)
+	private Entry(Group group)
 	{
-		ResxFile = resxFile;
+		Group = group;
 	}
 
-	public Entry(DictionaryEntry entry, ResxFile resxFile):this(resxFile)
+	public Entry(DictionaryEntry entry, Group group) :this(group)
 	{
 		Name = entry.Key.ToString();
 		Value = entry.Value.ToString();
 	}
 
-	public Entry(string nameValue, ResxFile resxFile) : this(resxFile)
+	public Entry(string name, Group group) : this(group)
 	{
-		Name = nameValue;
-		Value = string.Empty;
-		_noValue = true;
+		Name = name;
 	}
+
+	public bool IsEqual(Entry entry) => Group.IsEqual(entry.Group) && Name == entry.Name;
 }

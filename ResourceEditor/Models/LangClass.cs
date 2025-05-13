@@ -5,30 +5,31 @@ namespace ResourceEditor.Models;
 
 public class LangClass(ResxFile resxFile)
 {
-	public string Language { get; } = resxFile.Group.Language;
-	public List<ResxFile> ResxFiles { get; set; } = [resxFile];
+	public List<ResxFile> ResxFiles { get; } = [resxFile];
+	public string Language => ResxFiles[0].Group.Language;
 
-	public List<Entry> EntryListOrdered
+	public List<Entry> EntryList
 	{
 		get
 		{
 			var result = new List<Entry>();
 			foreach (var resxFile in ResxFiles)
 				result.AddRange(resxFile.Values);
-			return result.OrderBy(i=>i.Name).ThenBy(i=>i.ResxFile.Group.FileName).ToList();
+			return result;
 		}
 	}
 
-	public void AddEntryToResxFile(Name name)
+	public List<Entry> EntryListOrdered => EntryList.OrderBy(i=>i.Name).ThenBy(i=>i.Group.FileName).ToList();
+
+	public void AddEntryToResxFile(Entry entry)
 	{
-		var resxFile = ResxFiles.FirstOrDefault(i => i.Group.IsEqual(name.Group));
+		var resxFile = ResxFiles.FirstOrDefault(i => i.Group.IsEqual(entry.Group));
 		if(resxFile != null)
-			resxFile.Values.Add(new Entry(name.Value, resxFile));
+			resxFile.Values.Add(new Entry(entry.Name, resxFile.Group));
 		else
 		{
-			var newResxFile = new ResxFile(new Group(name.Group, Language));
-			newResxFile.Values.Add(new Entry(name.Value, newResxFile));
-			ResxFiles.Add(newResxFile);
+			
+			ResxFiles.Add(new ResxFile(entry, Language));
 		}
 	}
 }

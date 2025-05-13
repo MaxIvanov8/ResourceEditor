@@ -15,9 +15,10 @@ public class ResxFile
 		Values = [];
 	}
 
-	public ResxFile(Group group):this()
+	public ResxFile(Entry entry, string lang) : this()
 	{
-		Group = group;
+		Group = new Group(entry.Group, lang);
+		Values.Add(new Entry(entry.Name, Group));
 	}
 
 	public ResxFile(string fileName, string folderName) : this()
@@ -25,18 +26,17 @@ public class ResxFile
 		Group = new Group(fileName, folderName);
 		var resReader = new ResXResourceReader(fileName);
 		foreach (DictionaryEntry d in resReader)
-			Values.Add(new Entry(d,this));
+			Values.Add(new Entry(d, Group));
 		resReader.Close();
 	}
 
-	public void Save()
+	public void Save(bool addEmptyEntries)
 	{
-		if(Values.Any(d => d.NeedToWrite))
-		{
-			var resWriter = new ResXResourceWriter(Group.FileName);
-			foreach (var d in Values.Where(d => d.NeedToWrite))
-				resWriter.AddResource(d.Name, d.Value);
-			resWriter.Close();
-		}
+		if (!addEmptyEntries && Values.All(item => string.IsNullOrEmpty(item.Value))) return;
+		var resWriter = new ResXResourceWriter(Group.FileName);
+		var list = addEmptyEntries ? Values : Values.Where(item => !string.IsNullOrEmpty(item.Value)).ToList();
+		foreach (var d in list)
+			resWriter.AddResource(d.Name, d.Value);
+		resWriter.Close();
 	}
 }
